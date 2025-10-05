@@ -19,6 +19,6 @@ export interface Product {
 
 export interface ProductListProps {
   onProductPress?: (product: Product) => void;
-  apiUrl?: string;
-  products?: Product[];
+  type?: string;
+  query?: string;
 }

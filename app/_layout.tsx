@@ -18,12 +18,21 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  // const queryClient = new QueryClient({
+  //   defaultOptions: {
+  //     queries: {
+  //       staleTime: 60 * 1000 * 5, // 5 minutes
+        
+  //     },
+  //   },
+  // });
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <SafeAreaProvider>
 
       <StatusBar style="dark" />
+      {/* <QueryClientProvider client={queryClient}> */}
       <FavoriteProvider>
         <CartProvider>
             {/* <SafeAreaView/> */}
@@ -41,6 +50,7 @@ export default function RootLayout() {
             </Stack>
         </CartProvider>
       </FavoriteProvider>
+      {/* </QueryClientProvider> */}
       </SafeAreaProvider>
 
     </ThemeProvider>

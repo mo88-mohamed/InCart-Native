@@ -1,56 +1,108 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Product, ProductListProps } from '@/types/product';
-import React, { useEffect, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import React, { useEffect, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { ThemedView } from './themed-view';
 
 const API_URL = 'https://api.escuelajs.co/api/v1/products';
 
-const ProductList: React.FC<ProductListProps> = ({ onProductPress, apiUrl, products: initialProducts }) => {
-  const [products, setProducts] = useState<Product[]>(initialProducts || []);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
+  // Remove local loading and error states since useInfiniteQuery handles them
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const borderColor = useThemeColor({}, 'icon'); // Using icon color as border color
   const cardBackgroundColor = backgroundColor === '#fff' ? '#f8f9fa' : '#1f2937'; // Light/dark card background
 
-  useEffect(() => {
-    // Only fetch if no initial products are provided
-    if (!initialProducts || initialProducts.length == 0) {
-      fetchProducts();
+  // Construct the base URL for API calls
+  const getBaseUrl = () => {
+    if (type === 'search' && query) {
+      return `${API_URL}?title=${encodeURIComponent(query)}`;
     }
-  }, [initialProducts]);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(apiUrl || API_URL);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setProducts(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch products');
-      Alert.alert('Error', 'Failed to load products. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    return API_URL;
   };
+
+  const {data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isRefetching,
+    isLoading,
+    error: queryError} = useInfiniteQuery({
+      queryKey: [type === 'search' ? 'search' : 'products', query].filter(Boolean),
+      initialPageParam:1,
+      queryFn: async ({ pageParam = 1 }) => {
+        const offset = (pageParam - 1) * 10;
+        const baseUrl = getBaseUrl();
+        const separator = baseUrl.includes('?') ? '&' : '?';
+        const url = `${baseUrl}${separator}offset=${offset}&limit=10`;
+        console.log(url);
+        const response = await fetch(url);
+        return response.json();
+      },
+      getNextPageParam : (lastPage, allPages, lastPageParam) => {
+        // For offset-based pagination, check if we got a full page
+        // If the last page has fewer than 10 items, we've reached the end
+        if (lastPage && lastPage.length < 10) {
+          return undefined; // No more pages
+        }
+        return (lastPageParam || 1) + 1; // Next page number
+      },
+      // enabled: type !== 'search' || !query, // Only run query if not search or if query exists
+    })
+    const products = useMemo(() => data?.pages.flatMap(page => page), [data]);
+  //     setLoading(true);
+  //     const response = await fetch(apiUrl || API_URL);
+      
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+      
+  //     const data = await response.json();
+  //     setProducts(data);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : 'Failed to fetch products');
+  //     Alert.alert('Error', 'Failed to load products. Please try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  // const fetchProducts = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(apiUrl || API_URL);
+      
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+      
+  //     const data = await response.json();
+  //     setProducts(data);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : 'Failed to fetch products');
+  //     Alert.alert('Error', 'Failed to load products. Please try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+    console.log(products);
+  useEffect(() => {
+    // No need for manual effect since useInfiniteQuery handles everything
+    // The query will automatically refetch when query or type changes
+  }, [query, type]);
+
 
   const renderProduct = ({ item }: { item: Product }) => (
     <TouchableOpacity
@@ -59,27 +111,27 @@ const ProductList: React.FC<ProductListProps> = ({ onProductPress, apiUrl, produ
       activeOpacity={0.7}
     >
       <Image 
-        source={{ uri: item.images[0] || 'https://placehold.co/600x400' }} 
+        source={{ uri: item?.images?.length ? item?.images[0] : 'https://placehold.co/600x400' }} 
         style={styles.productImage} 
       />
       <View style={styles.productInfo}>
         <Text style={[styles.productTitle, { color: textColor }]} numberOfLines={2}>
-          {item.title}
+          {item?.title}
         </Text>
         <Text style={[styles.productCategory, { color: textColor, opacity: 0.7 }]}>
-          {item.category.name}
+          {item?.category?.name}
         </Text>
         <Text style={[styles.productPrice, { color: textColor }]}>
-          ${item.price.toFixed(2)}
+          ${item?.price?.toFixed(2)}
         </Text>
         <Text style={[styles.productDescription, { color: textColor, opacity: 0.8 }]} numberOfLines={2}>
-          {item.description}
+          {item?.description}
         </Text>
       </View>
     </TouchableOpacity>
   );
 
-  if (loading) {
+  if (isLoading || isRefetching) {
     return (
       <ThemedView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={textColor} />
@@ -88,15 +140,15 @@ const ProductList: React.FC<ProductListProps> = ({ onProductPress, apiUrl, produ
     );
   }
 
-  if (error) {
+  if (queryError) {
     return (
       <ThemedView style={styles.errorContainer}>
         <Text style={[styles.errorText, { color: textColor }]}>
-          {error}
+          {queryError?.message || 'An error occurred'}
         </Text>
         <TouchableOpacity
           style={[styles.retryButton, { borderColor }]}
-          onPress={fetchProducts}
+          onPress={() => refetch()}
         >
           <Text style={[styles.retryButtonText, { color: textColor }]}>
             Retry
@@ -109,16 +161,28 @@ const ProductList: React.FC<ProductListProps> = ({ onProductPress, apiUrl, produ
   return (
     <ThemedView style={styles.container}>
       <Text style={[styles.header, { color: textColor }]}>
-        Products ({products.length})
+        Products ({products?.length})
       </Text>
       <FlatList
         data={products}
         renderItem={renderProduct}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item?.id?.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         numColumns={2}
         columnWrapperStyle={styles.row}
+        onEndReached={() => {
+          if (!isFetchingNextPage && hasNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={isFetchingNextPage && hasNextPage ?
+          <ThemedView style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={textColor} />
+            <Text style={[styles.loadingText, { color: textColor }]}>Loading products...</Text>
+          </ThemedView>
+        : null}
       />
     </ThemedView>
   );

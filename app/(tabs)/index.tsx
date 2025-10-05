@@ -5,6 +5,7 @@ import { ThemedView } from '@/components/themed-view';
 import Top from '@/components/Top';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Product } from '@/types/product';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
@@ -14,11 +15,20 @@ export default function HomeScreen() {
   const handleProductPress = (product: Product) => {
     router.push(`/product/${product.id}`);
   };
-
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000 * 5, // 5 minutes
+        
+      },
+    },
+  });
   return (
     <ThemedView style={styles.container}>
       <Top/>
+      <QueryClientProvider client={queryClient}>
       <ProductList onProductPress={handleProductPress} />
+      </QueryClientProvider>
     </ThemedView>
   );
 }

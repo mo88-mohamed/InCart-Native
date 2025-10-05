@@ -3,10 +3,10 @@ import ProductList from '@/components/ProductList';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Product } from '@/types/product';
 import { FontAwesome } from '@expo/vector-icons';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { goBack } from 'expo-router/build/global-state/routing';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, View } from 'react-native';
-
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 
 
@@ -15,62 +15,73 @@ export default function search() {
     const textColor = useThemeColor({}, "text");
     const backgroundColor = useThemeColor({}, "background");
     const borderColor = useThemeColor({}, "icon");
-    
+
     const [query, setQuery] = useState<string>("");
     const [allProducts, setAllProducts] = useState<Product[]|undefined>(undefined);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+    const [searchQuery, setSearchQuery ] = useState<string>("");
 
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 60 * 1000 * 5, // 5 minutes
+
+        },
+      },
+    });
 
     const fetchAllProducts = async () => {
-        if (query && query.length===0) return
-        try {
+        if (!query || query.trim().length === 0) return;
 
-            setLoading(true);
-            const response = await fetch(`https://api.escuelajs.co/api/v1/products/?title=${query}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            setAllProducts(data);
-            setFilteredProducts(data);
+        setLoading(true);
+        try {
+            setSearchQuery(query.trim());
         } catch (err) {
-            Alert.alert('Error', 'Failed to load products. Please try again.');
+            Alert.alert('Error', 'Failed to search products. Please try again.');
         } finally {
             setLoading(false);
         }
     };
-  return (
-    <View style={[styles.container,{backgroundColor:backgroundColor}]}>
+
+    return(
+      <QueryClientProvider client={queryClient}>
+        <View style={[styles.container,{backgroundColor:backgroundColor}]}>
 
     <View style={[styles.searchContainer, { borderColor }]}>
       <FontAwesome name='angle-left' size={30} color={tint} onPress={goBack}  />
 
-      <TextInput 
-        style={[styles.searchInput, { color: textColor }]} 
-        placeholder='Search products...' 
+      <TextInput
+        style={[styles.searchInput, { color: textColor }]}
+        placeholder='Search products...'
         placeholderTextColor={textColor + '80'}
-        value={query} 
+        value={query}
         onChangeText={setQuery}
         returnKeyType='send'
         onSubmitEditing={fetchAllProducts}
       />
-      <FontAwesome style={[styles.searchicon]} name='search' size={24} color={tint} />
+      <TouchableOpacity onPress={fetchAllProducts} style={styles.searchButton}>
+        <FontAwesome name='search' size={20} color={tint} />
+      </TouchableOpacity>
+      {query.length > 0 && (
+        <TouchableOpacity onPress={() => { setQuery(''); setSearchQuery(''); }} style={styles.clearButton}>
+          <FontAwesome name='times' size={20} color={tint} />
+        </TouchableOpacity>
+      )}
 
     </View>
-    
+
     {loading ? (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={tint} />
         <Text style={[styles.loadingText, { color: textColor }]}>
-          Loading products...
+          Searching products...
         </Text>
       </View>
     ) : (
-      <ProductList 
-        products={allProducts} 
+      <ProductList
+        type="search"
+        query={searchQuery}
         onProductPress={(product) => {
           console.log('Selected product:', product.title);
         }}
@@ -78,6 +89,7 @@ export default function search() {
     )}
 
     </View>
+      </QueryClientProvider>
   )
 };
 
@@ -106,6 +118,16 @@ const styles = StyleSheet.create({
     },
     searchicon: {
         flex: 0
+    },
+    searchButton: {
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    clearButton: {
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     loadingContainer: {
         flex: 1,
