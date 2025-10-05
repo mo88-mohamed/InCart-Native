@@ -214,6 +214,14 @@ Run the linter to check code quality:
 ```bash
 npm run lint
 ```
+## Screenshots
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/241c81e6-d6f3-439f-931d-0ecf63a54762" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/0acaf04d-9a06-4e42-bfea-85d0cf82d427" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/3b0d9eb7-4e62-438f-b3d6-0608abdbc859" />
+
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/9b4ca115-167f-476c-8a33-a72d31da4989" />
+
+
 
 ## 🤝 Contributing
 
