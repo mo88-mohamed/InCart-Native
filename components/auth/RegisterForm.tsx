@@ -2,6 +2,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { RegisterData } from '@/types/auth';
 import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Alert,
     StyleSheet,
@@ -29,20 +30,21 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
   const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
   const borderColor = useThemeColor({}, 'icon');
+  const { t } = useTranslation();
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('error'), t('pleaseFillAllFields'));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(t('error'), t('passwordsDoNotMatch'));
       return;
     }
 
     if (formData.password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      Alert.alert(t('error'), t('passwordMinLength'));
       return;
     }
 
@@ -55,14 +57,14 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
 
   return (
     <View style={styles.formContainer}>
-      <Text style={[styles.title, { color: textColor }]}>Create Account</Text>
-      <Text style={[styles.subtitle, { color: textColor }]}>Join us today</Text>
+      <Text style={[styles.title, { color: textColor }]}>{t('createAccount')}</Text>
+      <Text style={[styles.subtitle, { color: textColor }]}>{t('joinUsToday')}</Text>
 
       <View style={styles.inputContainer}>
         <FontAwesome name="user" size={20} color={tintColor} style={styles.inputIcon} />
         <TextInput
           style={[styles.input, { color: textColor, borderColor }]}
-          placeholder="Full Name"
+          placeholder={t('fullName')}
           placeholderTextColor={textColor + '80'}
           value={formData.name}
           onChangeText={(text) => setFormData({ ...formData, name: text })}
@@ -75,7 +77,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
         <FontAwesome name="envelope" size={20} color={tintColor} style={styles.inputIcon} />
         <TextInput
           style={[styles.input, { color: textColor, borderColor }]}
-          placeholder="Email"
+          placeholder={t('email')}
           placeholderTextColor={textColor + '80'}
           value={formData.email}
           onChangeText={(text) => setFormData({ ...formData, email: text })}
@@ -89,7 +91,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
         <FontAwesome name="lock" size={20} color={tintColor} style={styles.inputIcon} />
         <TextInput
           style={[styles.input, { color: textColor, borderColor }]}
-          placeholder="Password"
+          placeholder={t('password')}
           placeholderTextColor={textColor + '80'}
           value={formData.password}
           onChangeText={(text) => setFormData({ ...formData, password: text })}
@@ -102,7 +104,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
         <FontAwesome name="lock" size={20} color={tintColor} style={styles.inputIcon} />
         <TextInput
           style={[styles.input, { color: textColor, borderColor }]}
-          placeholder="Confirm Password"
+          placeholder={t('confirmPassword')}
           placeholderTextColor={textColor + '80'}
           value={formData.confirmPassword}
           onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
@@ -117,7 +119,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
         disabled={isLoading}
       >
         <Text style={styles.primaryButtonText}>
-          {isLoading ? 'Creating Account...' : 'Create Account'}
+          {isLoading ? t('creatingAccount') : t('createAccountBtn')}
         </Text>
       </TouchableOpacity>
 
@@ -126,7 +128,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin, isLoading }:
         onPress={onSwitchToLogin}
       >
         <Text style={[styles.switchButtonText, { color: tintColor }]}>
-          Already have an account? Sign In
+          {t('alreadyHaveAccount')} {t('signIn')}
         </Text>
       </TouchableOpacity>
     </View>

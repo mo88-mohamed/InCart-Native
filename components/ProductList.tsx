@@ -2,6 +2,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { Product, ProductListProps } from '@/types/product';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   FlatList,
@@ -17,6 +18,8 @@ const API_URL = 'https://api.escuelajs.co/api/v1/products';
 
 const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
   // Remove local loading and error states since useInfiniteQuery handles them
+
+  const { t } = useTranslation();
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -97,7 +100,7 @@ const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
   //     setLoading(false);
   //   }
   // };
-    console.log(products);
+    // console.log(products);
   useEffect(() => {
     // No need for manual effect since useInfiniteQuery handles everything
     // The query will automatically refetch when query or type changes
@@ -135,7 +138,7 @@ const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
     return (
       <ThemedView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={textColor} />
-        <Text style={[styles.loadingText, { color: textColor }]}>Loading products...</Text>
+        <Text style={[styles.loadingText, { color: textColor }]}>{t('loadingProducts')}</Text>
       </ThemedView>
     );
   }
@@ -151,7 +154,7 @@ const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
           onPress={() => refetch()}
         >
           <Text style={[styles.retryButtonText, { color: textColor }]}>
-            Retry
+            {t('retry')}
           </Text>
         </TouchableOpacity>
       </ThemedView>
@@ -161,7 +164,7 @@ const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
   return (
     <ThemedView style={styles.container}>
       <Text style={[styles.header, { color: textColor }]}>
-        Products ({products?.length})
+        {t('title')} ({products?.length})
       </Text>
       <FlatList
         data={products}
@@ -180,7 +183,7 @@ const ProductList = ({ onProductPress, query, type }: ProductListProps) => {
         ListFooterComponent={isFetchingNextPage && hasNextPage ?
           <ThemedView style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={textColor} />
-            <Text style={[styles.loadingText, { color: textColor }]}>Loading products...</Text>
+            <Text style={[styles.loadingText, { color: textColor }]}>{t('loadingProducts')}</Text>
           </ThemedView>
         : null}
       />

@@ -1,6 +1,7 @@
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import ProfileView from '@/components/profile/ProfileView';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemedView } from '@/components/themed-view';
 import { LoginCredentials, RegisterData, User } from '@/types/auth';
 import React, { useState } from 'react';
@@ -71,6 +72,7 @@ export default function ProfileScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <LanguageSwitcher style={styles.languageSwitcher} />
         {user ? (
           <ProfileView user={user} onLogout={handleLogout} />
         ) : authMode === 'login' ? (
@@ -98,5 +100,9 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     padding: 20,
+  },
+  languageSwitcher: {
+    alignSelf: 'center',
+    marginBottom: 20,
   },
 });

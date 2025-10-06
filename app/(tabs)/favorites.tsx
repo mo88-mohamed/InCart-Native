@@ -2,6 +2,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useFavorites } from '@/context/FavoriteContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTranslation } from 'react-i18next';
 import { Product } from '@/types/product';
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -39,6 +40,7 @@ export default function FavoritesScreen() {
   const textColor = colorScheme === 'dark' ? Colors.dark.text : Colors.light.text;
   const cardBackground = colorScheme === 'dark' ? '#2A2A2A' : '#FFFFFF';
   const {favorites} = useFavorites();
+  const { t } = useTranslation();
 
   const renderItem = ({ item }: { item: Product }) => (
     <View style={[styles.itemContainer, { backgroundColor: cardBackground }]}>
@@ -65,8 +67,8 @@ export default function FavoritesScreen() {
   return (
     <View style={[styles.container, { backgroundColor, paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: textColor }]}>My Favorites</Text>
-        <Text style={styles.subtitle}>{favorites.length} items</Text>
+        <Text style={[styles.title, { color: textColor }]}>{t('myFavorites')}</Text>
+        <Text style={styles.subtitle}>{t('itemsCount', { count: favorites.length })}</Text>
       </View>
       
       {favorites.length > 0 ? (
@@ -80,9 +82,9 @@ export default function FavoritesScreen() {
       ) : (
         <View style={styles.emptyContainer}>
           <IconSymbol name="heart.slash" size={64} color={Colors[colorScheme ?? 'light'].tabIconDefault} />
-          <Text style={[styles.emptyText, { color: textColor }]}>No favorites yet</Text>
+          <Text style={[styles.emptyText, { color: textColor }]}>{t('noFavoritesYet')}</Text>
           <Text style={[styles.emptySubtext, { color: textColor }]}>
-            Tap the heart icon to add items to your favorites
+            {t('addToFavoritesInstruction')}
           </Text>
         </View>
       )}

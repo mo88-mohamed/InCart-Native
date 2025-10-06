@@ -10,7 +10,10 @@ import "react-native-reanimated";
 import { CartProvider } from "@/context/CartContext";
 import { FavoriteProvider } from "@/context/FavoriteContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { I18nextProvider } from "react-i18next";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import '../utils/i18n';
+import i18n from "../utils/i18n";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -32,25 +35,19 @@ export default function RootLayout() {
           <SafeAreaProvider>
 
       <StatusBar style="dark" />
-      {/* <QueryClientProvider client={queryClient}> */}
-      <FavoriteProvider>
-        <CartProvider>
-            {/* <SafeAreaView/> */}
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="modal"
-                options={{ presentation: "modal", title: "Modal" }}
-              />
-              <Stack.Screen
-                name="product/[id]"
-                options={{ headerShown: false }}
-              />
-              {/* <Stack.Screen name="search"  options={{headerShown:false,header:SearchInput}} /> */}
-            </Stack>
-        </CartProvider>
-      </FavoriteProvider>
-      {/* </QueryClientProvider> */}
+      <I18nextProvider i18n={i18n}>
+        <FavoriteProvider>
+          <CartProvider>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="modal"
+                  options={{ presentation: "modal", title: "Modal" }}
+                />
+              </Stack>
+          </CartProvider>
+        </FavoriteProvider>
+      </I18nextProvider>
       </SafeAreaProvider>
 
     </ThemeProvider>

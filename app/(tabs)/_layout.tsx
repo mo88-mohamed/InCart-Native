@@ -7,12 +7,14 @@ import { Colors } from "@/constants/theme";
 import { useCart } from "@/context/CartContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const tabBarActiveTintColor = Colors[colorScheme ?? "light"].tint;
   const tabBarInactiveTintColor = Colors[colorScheme ?? "light"].tabIconDefault;
   const { getCartItemsCount } = useCart();
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -47,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t('home'),
           tabBarIcon: ({ color, focused }) => (
             <View>
               <FontAwesome size={24} name="home" color={color} />
@@ -58,7 +60,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="favorites"
         options={{
-          title: "Favorites",
+          title: t('favorites'),
           href:null,
           tabBarIcon: ({ color, focused }) => (
             <View>
@@ -70,7 +72,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: "Cart",
+          title: t('cart'),
           tabBarIcon: ({ color, focused }) => (
             <View>
               <View style={styles.cartIconContainer}>
@@ -91,7 +93,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: t('profile'),
           tabBarIcon: ({ color, focused }) => (
             <View>
               <FontAwesome5 size={24} name="user" color={color} />
@@ -103,7 +105,7 @@ export default function TabLayout() {
         name="search"
         options={{
           href: null,
-          title: "Search",
+          title: t('search'),
         }}
       />
       <Tabs.Screen

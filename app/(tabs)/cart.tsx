@@ -2,6 +2,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useCart } from '@/context/CartContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTranslation } from 'react-i18next';
 import { CartItem } from '@/types/cart';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -33,6 +34,7 @@ export default function CartScreen() {
   const {addItem,clearCart,getCartItemsCount,getCartTotal,items,removeItem,updateItemQuantity} = useCart();
   // const [items, setItems] = useState(CART_ITEMS);
   const router = useRouter();
+  const { t } = useTranslation();
   const backgroundColor = colorScheme === 'dark' ? Colors.dark.background : Colors.light.background;
   const textColor = colorScheme === 'dark' ? Colors.dark.text : Colors.light.text;
   const cardBackground = colorScheme === 'dark' ? '#2A2A2A' : '#FFFFFF';
@@ -101,8 +103,8 @@ export default function CartScreen() {
   return (
     <View style={[styles.container, { backgroundColor, paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: textColor }]}>Shopping Cart</Text>
-        <Text style={styles.subtitle}>{items.length} items</Text>
+        <Text style={[styles.title, { color: textColor }]}>{t('shoppingCart')}</Text>
+        <Text style={styles.subtitle}>{t('itemsCount', { count: items.length })}</Text>
       </View>
       
       {items.length > 0 ? (
@@ -118,16 +120,16 @@ export default function CartScreen() {
           
           <View style={[styles.summaryContainer, { backgroundColor: cardBackground }]}>
             <View style={styles.summaryRow}>
-              <Text style={[styles.summaryText, { color: textColor }]}>Subtotal</Text>
+              <Text style={[styles.summaryText, { color: textColor }]}>{t('subtotal')}</Text>
               <Text style={[styles.summaryAmount, { color: textColor }]}>${getCartTotal().toFixed(2)}</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={[styles.summaryText, { color: textColor }]}>Shipping</Text>
+              <Text style={[styles.summaryText, { color: textColor }]}>{t('shipping')}</Text>
               <Text style={[styles.summaryAmount, { color: textColor }]}>$0.00</Text>
             </View>
             <View style={styles.divider} />
             <View style={[styles.summaryRow, { marginBottom: 0 }]}>
-              <Text style={[styles.totalText, { color: textColor }]}>Total</Text>
+              <Text style={[styles.totalText, { color: textColor }]}>{t('total')}</Text>
               <Text style={[styles.totalAmount, { color: tintColor }]}>${getCartTotal().toFixed(2)}</Text>
             </View>
             
@@ -135,7 +137,7 @@ export default function CartScreen() {
               style={[styles.checkoutButton, { backgroundColor: tintColor }]}
               activeOpacity={0.8}
             >
-              <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
+              <Text style={styles.checkoutButtonText}>{t('proceedToCheckout')}</Text>
               <IconSymbol name="arrow.right" size={20} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -143,9 +145,9 @@ export default function CartScreen() {
       ) : (
         <View style={styles.emptyContainer}>
           <IconSymbol name="cart" size={64} color={Colors[colorScheme ?? 'light'].tabIconDefault} />
-          <Text style={[styles.emptyText, { color: textColor }]}>Your cart is empty</Text>
+          <Text style={[styles.emptyText, { color: textColor }]}>{t('emptyCart')}</Text>
           <Text style={[styles.emptySubtext, { color: textColor }]}>
-            Looks like you haven't added anything to your cart yet
+            {t('emptyCartMessage')}
           </Text>
           {/* <TouchableOpacity 
             style={[styles.continueButton, { borderColor: tintColor }]}

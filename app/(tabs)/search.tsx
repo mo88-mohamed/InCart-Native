@@ -2,12 +2,13 @@
 import ProductList from '@/components/ProductList';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Product } from '@/types/product';
+import { checkIsRTL } from '@/utils/i18n';
 import { FontAwesome } from '@expo/vector-icons';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { goBack } from 'expo-router/build/global-state/routing';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 
 export default function search() {
@@ -21,7 +22,8 @@ export default function search() {
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery ] = useState<string>("");
-
+    const {t} = useTranslation();
+    const isRTL = checkIsRTL();
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -38,7 +40,7 @@ export default function search() {
         try {
             setSearchQuery(query.trim());
         } catch (err) {
-            Alert.alert('Error', 'Failed to search products. Please try again.');
+            // Alert.alert('Error', 'Failed to search products. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -49,11 +51,11 @@ export default function search() {
         <View style={[styles.container,{backgroundColor:backgroundColor}]}>
 
     <View style={[styles.searchContainer, { borderColor }]}>
-      <FontAwesome name='angle-left' size={30} color={tint} onPress={goBack}  />
+      <FontAwesome name={isRTL?'angle-right':'angle-left'} size={30} color={tint} onPress={goBack}  />
 
       <TextInput
         style={[styles.searchInput, { color: textColor }]}
-        placeholder='Search products...'
+        placeholder={t('search')}
         placeholderTextColor={textColor + '80'}
         value={query}
         onChangeText={setQuery}
@@ -75,7 +77,7 @@ export default function search() {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={tint} />
         <Text style={[styles.loadingText, { color: textColor }]}>
-          Searching products...
+          {t('searching')}
         </Text>
       </View>
     ) : (

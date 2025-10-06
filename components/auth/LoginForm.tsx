@@ -2,6 +2,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { LoginCredentials } from '@/types/auth';
 import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Alert,
     StyleSheet,
@@ -27,10 +28,11 @@ export default function LoginForm({ onLogin, onSwitchToRegister, isLoading }: Lo
   const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
   const borderColor = useThemeColor({}, 'icon');
+  const { t } = useTranslation();
 
   const handleSubmit = async () => {
     if (!formData.email || !formData.password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('error'), t('pleaseFillAllFields'));
       return;
     }
 
@@ -43,14 +45,14 @@ export default function LoginForm({ onLogin, onSwitchToRegister, isLoading }: Lo
 
   return (
     <View style={styles.formContainer}>
-      <Text style={[styles.title, { color: textColor }]}>Welcome Back</Text>
-      <Text style={[styles.subtitle, { color: textColor }]}>Sign in to your account</Text>
+      <Text style={[styles.title, { color: textColor }]}>{t('welcomeBack')}</Text>
+      <Text style={[styles.subtitle, { color: textColor }]}>{t('signInToAccount')}</Text>
 
       <View style={styles.inputContainer}>
         <FontAwesome name="envelope" size={20} color={tintColor} style={styles.inputIcon} />
         <TextInput
           style={[styles.input, { color: textColor, borderColor }]}
-          placeholder="Email"
+          placeholder={t('email')}
           placeholderTextColor={textColor + '80'}
           value={formData.email}
           onChangeText={(text) => setFormData({ ...formData, email: text })}
@@ -64,7 +66,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister, isLoading }: Lo
         <FontAwesome name="lock" size={20} color={tintColor} style={styles.inputIcon} />
         <TextInput
           style={[styles.input, { color: textColor, borderColor }]}
-          placeholder="Password"
+          placeholder={t('password')}
           placeholderTextColor={textColor + '80'}
           value={formData.password}
           onChangeText={(text) => setFormData({ ...formData, password: text })}
@@ -79,7 +81,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister, isLoading }: Lo
         disabled={isLoading}
       >
         <Text style={styles.primaryButtonText}>
-          {isLoading ? 'Signing In...' : 'Sign In'}
+          {isLoading ? t('signingIn') : t('signIn')}
         </Text>
       </TouchableOpacity>
 
@@ -88,7 +90,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister, isLoading }: Lo
         onPress={onSwitchToRegister}
       >
         <Text style={[styles.switchButtonText, { color: tintColor }]}>
-          Don't have an account? Sign Up
+          {t('dontHaveAccount')} {t('signUp')}
         </Text>
       </TouchableOpacity>
     </View>

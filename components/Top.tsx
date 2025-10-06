@@ -2,6 +2,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
@@ -11,6 +12,7 @@ export default function Top() {
     const tint = useThemeColor({},'tint');
     const textColo = useThemeColor({},"text");
     const router = useRouter();
+    const {t} = useTranslation();
   return (
     <View style={[styles.container]}>
       <TouchableOpacity style={[styles.button,styles.searchbutton]} onPress={()=>router.navigate('/search')}>
@@ -18,7 +20,7 @@ export default function Top() {
         
         {/* <FontAwesome name='angle-left' size={30} color={tint} /> */}
         <Text style={[{color:textColo,flex:1}]}>
-            Search
+            {t('search')}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button,styles.favbutton]} onPress={()=>router.navigate('/favorites')}>
